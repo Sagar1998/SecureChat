@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -276,11 +277,16 @@ public class ChatActivity extends AppCompatActivity {
             final String push_id = user_message_push.getKey();
 
 
-            StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".jpg");
+            final StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".jpg");
 
-            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            filepath.putFile(imageUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
 
                     if(task.isSuccessful()){
 
@@ -315,7 +321,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
                     }
-
+                    return filepath.getDownloadUrl();
                 }
             });
 
