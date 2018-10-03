@@ -139,6 +139,13 @@ public class MainActivity extends AppCompatActivity {
             startActivity(settingsIntent);
 
         }
+        if (item.getItemId() == R.id.stegno_btn)
+        {
+            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.akseltorgard.steganography");
+            if (launchIntent != null) {
+                startActivity(launchIntent);//null pointer check in case package name was not found
+            }
+        }
 
         return true;
     }
